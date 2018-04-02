@@ -66,23 +66,6 @@ class Message:
         self.msg = msg
         self.directory = directory
 
-    def getmailheader(self, header_text, default="ascii"):
-        """Decode header_text if needed"""
-        try:
-            headers = email.header.decode_header(header_text)
-        except email.Errors.HeaderParseError:
-            # This already append in email.base64mime.decode()
-            # instead return a sanitized ascii string
-            return header_text.encode('ascii', 'replace').decode('ascii')
-        else:
-            for i, (text, charset) in enumerate(headers):
-                headers[i] = text
-                if charset:
-                    headers[i] = str(text, charset)
-                else:
-                    headers[i] = str(text)
-            return u"".join(headers)
-
     def normalizeDate(self, datestr):
         t = email.utils.parsedate_tz(datestr)
         timeval = time.mktime(t[:-1])
