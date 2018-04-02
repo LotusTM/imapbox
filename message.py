@@ -98,7 +98,7 @@ class Message:
             with io.open('%s/metadata.json' % (self.directory), 'w', encoding='utf8') as json_file:
                 data = json.dumps({
                     'Id': self.msg['Message-Id'].strip(),
-                    'Subject': self.msg['Subject'].strip(),
+                    'Subject': self.msg['Subject'].strip() if self.msg['Subject'] is not None else '',
                     'From': self.msg['From'],
                     'To': self.msg['To'],
                     'Cc': self.msg['Cc'],
@@ -151,8 +151,8 @@ class Message:
             path = os.path.join('attachments', img[1])
             content = re.sub(pattern, 'src="%s"' % (path), content, 0, re.S | re.I)
 
-        subject = self.msg['subject']
-        fromname = self.msg['from']
+        subject = self.msg['Subject']
+        fromname = self.msg['From']
 
         content = """<!doctype html>
 <html>
