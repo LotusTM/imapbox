@@ -127,7 +127,7 @@ class MailboxClient:
         try:
             msg = Message(directory, message)
             msg.create_raw_file(body)
-            msg.createMetaFile()
+            msg.create_meta_file()
             msg.extract_attachments()
 
         except Exception as e:

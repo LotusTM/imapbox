@@ -34,7 +34,6 @@ def strip_tags(html):
 
 
 class Message:
-    """Operation on a message"""
 
     def __init__(self, directory, msg):
         self.msg = msg
@@ -48,23 +47,23 @@ class Message:
 
         return (rfc2822, iso8601)
 
-    def createMetaFile(self):
-
+    def create_meta_file(self):
         parts = self.get_parts()
         attachments = []
-        for afile in parts['files']:
-            attachments.append(afile[1])
+        content = ''
 
-        text_content = ''
+        for file in parts['files']:
+            attachments.append(file[1])
 
         if parts['text']:
-            text_content = self.getTextContent(parts['text'])
-        else:
-            if parts['html']:
-                text_content = strip_tags(self.getHtmlContent(parts['html']))
+            content = self.getTextContent(parts['text'])
+        elif parts['html']:
+            content = strip_tags(self.getHtmlContent(parts['html']))
 
-        # Calendar items does not have a Date property
+        # Filter out Calendar items, they do not have a Date property
         if self.msg['Date'] is not None:
+            Id = self.msg['Message-Id'].strip() if self.msg['Message-Id'] is not None else ''
+            Subject = self.msg['Subject'].strip() if self.msg['Subject'] is not None else ''
             rfc2822, iso8601 = self.normalizeDate(self.msg['Date'])
 
             with io.open('%s/metadata.json' % (self.directory), 'w', encoding='utf8') as json_file:
