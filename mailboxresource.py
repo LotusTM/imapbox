@@ -36,16 +36,14 @@ class MailboxClient:
             logging.error('Unable to login to: ', self.username)
 
     def copy_emails(self, days, local_folder):
-        self.days = days
         self.local_folder = local_folder
         self.saved = 0
 
         criterion = 'ALL'
 
         if days:
-            date = date.today() - timedelta(days)
-            date = date.strftime('%d-%b-%Y')
-            criterion = '(SENTSINCE {date})'.format(date=date)
+            since = date.today() - timedelta(days)
+            criterion = ['SINCE', since.strftime('%d-%b-%Y')]
 
         if self.remote_folder == 'ALL':
             for flags, delimiter, folder in self.mailbox.list_folders():
