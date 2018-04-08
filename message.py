@@ -41,12 +41,10 @@ class Message:
         self.directory = directory
 
     def normalizeDate(self, datestr):
-        t = email.utils.parsedate_tz(datestr)
-        timeval = time.mktime(t[:-1])
-        date = email.utils.formatdate(timeval, True)
-        utc = time.gmtime(email.utils.mktime_tz(t))
-        rfc2822 = '{} {:+03d}00'.format(date[:-6], t[9]//3600)
-        iso8601 = time.strftime('%Y%m%dT%H%M%SZ', utc)
+        t = email.utils.parsedate_to_datetime(datestr)
+        rfc2822 = email.utils.format_datetime(t)
+        # TODO: convert it to UTC
+        iso8601 = t.isoformat()
 
         return (rfc2822, iso8601)
 
