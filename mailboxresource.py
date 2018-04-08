@@ -3,12 +3,12 @@
 import os
 import re
 import email
-import imaplib
 import hashlib
 import logging
 from email import policy
 from message import Message
 from datetime import date, timedelta
+from imapclient import IMAPClient
 
 logging.basicConfig(
     filename='imapbox.log',
@@ -28,7 +28,7 @@ class MailboxClient:
         self.password = password
         self.remote_folder = remote_folder
 
-        self.mailbox = imaplib.IMAP4_SSL(self.host, self.port)
+        self.mailbox = IMAPClient(self.host, self.port)
 
         try:
             self.mailbox.login(self.username, self.password)
@@ -39,7 +39,6 @@ class MailboxClient:
         self.days = days
         self.local_folder = local_folder
         self.saved = 0
-        self.existed = 0
 
         criterion = 'ALL'
 
@@ -49,45 +48,28 @@ class MailboxClient:
             criterion = '(SENTSINCE {date})'.format(date=date)
 
         if self.remote_folder == 'ALL':
-            for i in self.mailbox.list()[1]:
-                folder = i.decode().split(' "/" ')[1]
+            for flags, delimiter, folder in self.mailbox.list_folders():
                 self.fetch_emails(folder, criterion)
         else:
             self.fetch_emails(self.remote_folder, criterion)
 
-        return (self.saved, self.existed)
+        return self.saved
 
     def fetch_emails(self, folder, criterion):
         n_saved = 0
-        n_existed = 0
-        n_total = 0
 
-        self.mailbox.select(folder, readonly=True)
+        self.mailbox.select_folder(folder, readonly=True)
 
-        status, data = self.mailbox.search(None, criterion)
-        msgnums = data[0].split()
-        n_total = len(msgnums)
-        for num in msgnums:
-            status, data = self.mailbox.fetch(num, '(RFC822)')
-            if self.save_email(data):
-                n_saved += 1
-            else:
-                n_existed += 1
+        for message in self.mailbox.search(criterion):
+            for msgid, data in self.mailbox.fetch(message, ['RFC822']).items():
+                if self.save_email(data):
+                    n_saved += 1
 
-        logging.info(
-            '[%s/%s] - saved: %s, existed: %s, total: %s;',
-            self.username,
-            folder.replace('"', ''),
-            n_saved,
-            n_existed,
-            n_total
-        )
+        logging.info('[%s/%s] - saved: %s;', self.username, folder, n_saved)
 
         self.saved += n_saved
-        self.existed += n_existed
 
-    def cleanup(self):
-        self.mailbox.close()
+    def logout(self):
         self.mailbox.logout()
 
     def get_email_folder(self, message, body):
@@ -107,7 +89,7 @@ class MailboxClient:
         return os.path.join(self.local_folder, year, foldername)
 
     def save_email(self, data):
-        body = data[0][1]
+        body = data[b'RFC822']
         try:
             message = email.message_from_bytes(body, policy=policy.default)
         except Exception as e:
