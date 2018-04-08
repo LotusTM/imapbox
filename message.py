@@ -132,7 +132,7 @@ class Message:
 <body>
 %s
 </body>
-</html>""" % (html.escape(fromname), html.escape(subject), html.escape(content))
+</html>""" % (html.escape(fromname), html.escape(subject), content)
 
         with open(os.path.join(self.directory, 'message.html'), 'w') as fp:
             fp.write(content)
