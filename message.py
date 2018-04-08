@@ -192,15 +192,15 @@ class Message:
             self.createHtmlFile(message_parts['html'], message_parts['embed_images'])
 
         if message_parts['files']:
-            attdir = os.path.join(self.directory, 'attachments')
+            directory = os.path.join(self.directory, 'attachments')
 
             try:
-                os.makedirs(attdir)
+                os.makedirs(directory)
             except FileExistsError:
                 pass
 
             for file in message_parts['files']:
-                with open(os.path.join(attdir, file[1]), 'wb') as fp:
+                with open(os.path.join(directory, file[1]), 'wb') as fp:
                     payload = file[0].get_payload(decode=True)
                     if payload:
                         fp.write(payload)
