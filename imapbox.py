@@ -20,6 +20,7 @@ def load_configuration(args):
 
     options = {
         'days': config.get('imapbox', 'days', fallback=args.days),
+        'limit': config.get('imapbox', 'limit', fallback=args.limit),
         'local_folder': os.path.expanduser(
             config.get('imapbox', 'local_folder', fallback=args.local_folder)
         ),
@@ -104,6 +105,13 @@ def main():
         default=None
     )
     argparser.add_argument(
+        '-limit',
+        dest='limit',
+        help='How many emails to get during single fetch',
+        type=int,
+        default=10,
+    )
+    argparser.add_argument(
         '-a',
         dest='account',
         help='Select a specific account to backup',
@@ -123,7 +131,7 @@ def main():
         )
 
         mailbox = MailboxClient(**account)
-        n_saved = mailbox.copy_emails(options['days'], options['local_folder'])
+        n_saved = mailbox.copy_emails(options['days'], options['local_folder'], options['limit'])
         mailbox.logout()
 
         logging.info(

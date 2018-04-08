@@ -18,6 +18,16 @@ logging.basicConfig(
 )
 
 
+def split(arr, size):
+    arrs = []
+    while len(arr) > size:
+        pice = arr[:size]
+        arrs.append(pice)
+        arr = arr[size:]
+    arrs.append(arr)
+    return arrs
+
+
 class MailboxClient:
 
     def __init__(self, name, host, port, username, password, remote_folder):
@@ -35,14 +45,16 @@ class MailboxClient:
         except imaplib.IMAP4.error:
             logging.error('Unable to login to: ', self.username)
 
-    def copy_emails(self, days, local_folder):
+    def copy_emails(self, days, limit, local_folder):
+        self.days = days
+        self.limit = limit
         self.local_folder = local_folder
         self.saved = 0
 
         criterion = 'ALL'
 
-        if days:
-            since = date.today() - timedelta(days)
+        if self.days:
+            since = date.today() - timedelta(self.days)
             criterion = ['SINCE', since.strftime('%d-%b-%Y')]
 
         if self.remote_folder == 'ALL':
@@ -58,8 +70,9 @@ class MailboxClient:
 
         self.mailbox.select_folder(folder, readonly=True)
 
-        for message in self.mailbox.search(criterion):
-            for msgid, data in self.mailbox.fetch(message, ['RFC822']).items():
+        messages = self.mailbox.search(criterion)
+        for part in split(messages, self.limit):
+            for msgid, data in self.mailbox.fetch(part, ['RFC822']).items():
                 if self.save_email(data):
                     n_saved += 1
 
