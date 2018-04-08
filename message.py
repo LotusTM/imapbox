@@ -102,7 +102,7 @@ class Message:
 
     def createTextFile(self, parts):
         content = self.getTextContent(parts)
-        with open(os.path.join(self.directory, 'message.txt'), 'w', encoding='utf-8') as fp:
+        with open(os.path.join(self.directory, 'message.txt'), 'w') as fp:
             fp.write(content)
 
     def getHtmlContent(self, parts):
@@ -140,7 +140,7 @@ class Message:
 </body>
 </html>""" % (cgi.escape(fromname), cgi.escape(subject), content)
 
-        with open(os.path.join(self.directory, 'message.html'), 'w', encoding='utf-8') as fp:
+        with open(os.path.join(self.directory, 'message.html'), 'w') as fp:
             fp.write(content)
 
     def sanitizeFilename(self, filename):
