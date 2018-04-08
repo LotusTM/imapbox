@@ -66,10 +66,10 @@ class Message:
             Subject = self.msg['Subject'].strip() if self.msg['Subject'] is not None else ''
             rfc2822, iso8601 = self.normalizeDate(self.msg['Date'])
 
-            with io.open('%s/metadata.json' % (self.directory), 'w', encoding='utf8') as json_file:
-                data = json.dumps({
-                    'Id': self.msg['Message-Id'].strip(),
-                    'Subject': self.msg['Subject'].strip() if self.msg['Subject'] is not None else '',
+            with open(os.path.join(self.directory, 'metadata.json'), 'w') as fp:
+                fp.write(json.dumps({
+                    'Id': Id,
+                    'Subject': Subject,
                     'From': self.msg['From'],
                     'To': self.msg['To'],
                     'Cc': self.msg['Cc'],
@@ -78,12 +78,8 @@ class Message:
                     'Attachments': attachments,
                     'WithHtml': len(parts['html']) > 0,
                     'WithText': len(parts['text']) > 0,
-                    'Body': text_content
-                }, indent=4, ensure_ascii=False)
-
-                json_file.write(data)
-
-                json_file.close()
+                    'Body': content
+                }, indent=4, ensure_ascii=False))
 
     def create_raw_file(self, data):
         with gzip.open(os.path.join(self.directory, 'raw.eml.gz'), 'wb') as fp:
