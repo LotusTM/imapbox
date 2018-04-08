@@ -10,7 +10,7 @@ logging.basicConfig(
     filename='imapbox.log',
     format='%(asctime)s - %(levelname)s: %(message)s',
     datefmt='%Y-%m-%dТ%H:%M:%S%z',
-    level=logging.INFO
+    level=logging.INFO,
 )
 
 
@@ -27,6 +27,7 @@ def load_configuration(args):
         'accounts': []
     }
 
+    # TODO: will not work with empty config and credentials passed as args
     for section_name in config.sections():
 
         if (section_name == 'imapbox'):
@@ -45,7 +46,7 @@ def load_configuration(args):
             'remote_folder': section.get('remote_folder', args.remote_folder)
         }
 
-        if (account['host'] is None or account['username'] is None or account['password'] is None):
+        if ((account['host'] or account['username'] or account['password']) is None):
             continue
 
         options['accounts'].append(account)
@@ -55,54 +56,53 @@ def load_configuration(args):
 
 def main():
     argparser = argparse.ArgumentParser(
-        description='Export messages into .eml files using IMAP protocol'
+        description='Export messages into .eml files using IMAP protocol',
     )
     argparser.add_argument(
         '-host',
         dest='host',
-        help='IMAP server host name'
+        help='IMAP server host name',
     )
     argparser.add_argument(
         '-port',
         dest='port',
         help='IMAP server port',
         type=int,
-        default=993
+        default=993,
     )
     argparser.add_argument(
         '-u',
         dest='username',
-        help='Username to access email account'
+        help='Username to access email account',
     )
     argparser.add_argument(
         '-p',
         dest='password',
-        help='Password to access email account'
+        help='Password to access email account',
     )
     argparser.add_argument(
         '-c',
         dest='config_path',
         help='Path to configuration file',
-        default='config.ini'
+        default='config.ini',
     )
     argparser.add_argument(
         '-l',
         dest='local_folder',
         help='Local folder where to dump emails',
-        default='./archive'
+        default='./archive',
     )
     argparser.add_argument(
         '-r',
         dest='remote_folder',
         help='Remote IMAP folder that should be backed up',
-        default='INBOX'
+        default='INBOX',
     )
     argparser.add_argument(
         '-d',
         dest='days',
         help='How many days of correspondence to back up',
         type=int,
-        default=None
     )
     argparser.add_argument(
         '-limit',
@@ -115,7 +115,6 @@ def main():
         '-a',
         dest='account',
         help='Select a specific account to backup',
-        default=None
     )
     args = argparser.parse_args()
     options = load_configuration(args)
@@ -131,7 +130,7 @@ def main():
         )
 
         mailbox = MailboxClient(**account)
-        n_saved = mailbox.copy_emails(options['days'], options['local_folder'], options['limit'])
+        n_saved = mailbox.copy_emails(options['days'], options['limit'], options['local_folder'])
         mailbox.logout()
 
         logging.info(
