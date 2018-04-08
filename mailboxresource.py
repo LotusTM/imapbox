@@ -35,7 +35,7 @@ class MailboxClient:
         except imaplib.IMAP4.error:
             print('Unable to login to: ', self.username)
 
-    def fetch_emails(self, days, local_folder):
+    def copy_emails(self, days, local_folder):
         self.days = days
         self.local_folder = local_folder
         self.saved = 0
@@ -51,13 +51,13 @@ class MailboxClient:
         if self.remote_folder == 'ALL':
             for i in self.mailbox.list()[1]:
                 folder = i.decode().split(' "/" ')[1]
-                self.copy_emails(folder, criterion)
+                self.fetch_emails(folder, criterion)
         else:
-            self.copy_emails(self.remote_folder, criterion)
+            self.fetch_emails(self.remote_folder, criterion)
 
         return (self.saved, self.existed)
 
-    def copy_emails(self, folder, criterion):
+    def fetch_emails(self, folder, criterion):
         n_saved = 0
         n_existed = 0
         n_total = 0
