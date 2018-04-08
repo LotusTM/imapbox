@@ -6,9 +6,9 @@ import email
 import imaplib
 import hashlib
 import logging
-import datetime
 from email import policy
 from message import Message
+from datetime import date, timedelta
 
 logging.basicConfig(
     filename='imapbox.log',
@@ -44,7 +44,7 @@ class MailboxClient:
         criterion = 'ALL'
 
         if days:
-            date = datetime.date.today() - datetime.timedelta(days)
+            date = date.today() - timedelta(days)
             date = date.strftime('%d-%b-%Y')
             criterion = '(SENTSINCE {date})'.format(date=date)
 
