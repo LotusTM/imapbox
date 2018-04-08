@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import io
 import os
 import re
 import cgi
@@ -8,34 +7,9 @@ import json
 import gzip
 import time
 import email
-import pkgutil
 import chardet
 import mimetypes
 from html.parser import HTMLParser
-
-# email address REGEX matching the RFC 2822 spec
-# from perlfaq9
-#    my $atom       = qr{[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+};
-#    my $dot_atom   = qr{$atom(?:\.$atom)*};
-#    my $quoted     = qr{"(?:\\[^\r\n]|[^\\"])*"};
-#    my $local      = qr{(?:$dot_atom|$quoted)};
-#    my $domain_lit = qr{\[(?:\\\S|[\x21-\x5a\x5e-\x7e])*\]};
-#    my $domain     = qr{(?:$dot_atom|$domain_lit)};
-#    my $addr_spec  = qr{$local\@$domain};
-#
-# Python translation
-
-atom_rfc2822=r"[a-zA-Z0-9_!#\$\%&'*+/=?\^`{}~|\-]+"
-atom_posfix_restricted=r"[a-zA-Z0-9_#\$&'*+/=?\^`{}~|\-]+" # without '!' and '%'
-atom=atom_rfc2822
-dot_atom=atom  +  r"(?:\."  +  atom  +  ")*"
-quoted=r'"(?:\\[^\r\n]|[^\\"])*"'
-local="(?:"  +  dot_atom  +  "|"  +  quoted  +  ")"
-domain_lit=r"\[(?:\\\S|[\x21-\x5a\x5e-\x7e])*\]"
-domain="(?:"  +  dot_atom  +  "|"  +  domain_lit  +  ")"
-addr_spec=local  +  "\@"  +  domain
-
-email_address_re=re.compile('^'+addr_spec+'$')
 
 
 class MLStripper(HTMLParser):
@@ -204,9 +178,7 @@ class Message:
                         ext = '.bin'
                     filename = 'part-%03d%s' % (counter, ext)
 
-                #print('ORIGINAL: ', filename)
                 filename = self.sanitizeFilename(filename)
-                #print('REPLACED: ', filename)
 
                 content_id = part.get('Content-Id')
                 if (content_id):
