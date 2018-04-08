@@ -33,7 +33,7 @@ class MailboxClient:
         try:
             self.mailbox.login(self.username, self.password)
         except imaplib.IMAP4.error:
-            print('Unable to login to: ', self.username)
+            logging.error('Unable to login to: ', self.username)
 
     def copy_emails(self, days, local_folder):
         self.days = days
@@ -111,7 +111,7 @@ class MailboxClient:
         try:
             message = email.message_from_bytes(body, policy=policy.default)
         except Exception as e:
-            print(e)
+            logging.error(e)
 
         directory = self.get_email_folder(message, body)
 
@@ -127,7 +127,7 @@ class MailboxClient:
             msg.extract_attachments()
 
         except Exception as e:
-            print('Faulty email: ', directory)
-            print(e)
+            logging.error('Faulty email: ', directory)
+            logging.error(e)
 
         return True
