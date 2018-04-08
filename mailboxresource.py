@@ -131,7 +131,7 @@ class MailboxClient:
             msg.extract_attachments()
 
         except Exception as e:
-            logging.error('Faulty email: ', directory)
+            logging.info('Faulty email: ', directory)
             logging.exception(e)
 
         return True
