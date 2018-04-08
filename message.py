@@ -2,7 +2,7 @@
 
 import os
 import re
-import cgi
+import html
 import json
 import gzip
 import time
@@ -123,14 +123,16 @@ class Message:
         content = """<!doctype html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="author" content="%s">
     <title>%s</title>
 </head>
+
 <body>
 %s
 </body>
-</html>""" % (cgi.escape(fromname), cgi.escape(subject), content)
+</html>""" % (html.escape(fromname), html.escape(subject), html.escape(content))
 
         with open(os.path.join(self.directory, 'message.html'), 'w') as fp:
             fp.write(content)
