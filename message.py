@@ -87,9 +87,8 @@ class Message:
                 json_file.close()
 
     def create_raw_file(self, data):
-        f = gzip.open('%s/raw.eml.gz' % (self.directory), 'wb')
-        f.write(data)
-        f.close()
+        with gzip.open(os.path.join(self.directory, 'raw.eml.gz'), 'wb') as fp:
+            fp.write(data)
 
     def getTextContent(self, parts):
         if not hasattr(self, 'text_content'):
