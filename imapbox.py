@@ -126,18 +126,23 @@ def main():
             account['name'],
             account['remote_folder'],
             account['host'],
-            account['port']
+            account['port'],
         )
 
         mailbox = MailboxClient(**account)
-        n_saved = mailbox.copy_emails(options['days'], options['limit'], options['local_folder'])
+        stats = mailbox.copy_emails(
+            options['days'],
+            options['limit'],
+            options['local_folder']
+        )
         mailbox.logout()
 
         logging.info(
-            '[%s/%s] %s emails downloaded;',
+            '[%s/%s] downloaded emails %s/%s;',
             account['name'],
             account['remote_folder'],
-            n_saved
+            stats[0],
+            stats[1],
         )
 
 

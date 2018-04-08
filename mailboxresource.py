@@ -50,6 +50,7 @@ class MailboxClient:
         self.limit = limit
         self.local_folder = local_folder
         self.saved = 0
+        self.total = 0
 
         criterion = 'ALL'
 
@@ -63,10 +64,11 @@ class MailboxClient:
         else:
             self.fetch_emails(self.remote_folder, criterion)
 
-        return self.saved
+        return (self.saved, self.total)
 
     def fetch_emails(self, folder, criterion):
-        n_saved = 0
+        saved = 0
+        total = 0
 
         self.mailbox.select_folder(folder, readonly=True)
 
@@ -74,11 +76,19 @@ class MailboxClient:
         for part in split(messages, self.limit):
             for msgid, data in self.mailbox.fetch(part, ['RFC822']).items():
                 if self.save_email(data):
-                    n_saved += 1
+                    saved += 1
 
-        logging.info('[%s/%s] - saved: %s;', self.username, folder, n_saved)
+        total = len(messages)
+        logging.info(
+            '[%s/%s] - saved: %s, total: %s;',
+            self.username,
+            folder,
+            saved,
+            total
+        )
 
-        self.saved += n_saved
+        self.saved += saved
+        self.total += total
 
     def logout(self):
         self.mailbox.logout()
@@ -101,6 +111,7 @@ class MailboxClient:
 
     def save_email(self, data):
         body = data[b'RFC822']
+
         try:
             message = email.message_from_bytes(body, policy=policy.default)
         except Exception as e:
