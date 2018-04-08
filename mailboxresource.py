@@ -93,10 +93,9 @@ class MailboxClient:
 
         year = 'None'
         if message['Date']:
-            # TODO: replace with email.utils.parsedate()
-            match = re.search('\d{1,2}\s\w{3}\s(\d{4})', message['Date'])
+            match = email.utils.parsedate(message['Date'])
             if match:
-                year = match.group(1)
+                year = str(match[0])
 
         return os.path.join(self.local_folder, year, foldername)
 
