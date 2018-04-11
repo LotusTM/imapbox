@@ -117,8 +117,8 @@ class Message:
             path = os.path.join('attachments', img[1])
             content = re.sub(pattern, 'src="%s"' % (path), content, 0, re.S | re.I)
 
-        subject = self.msg['Subject']
-        fromname = self.msg['From']
+        subject = self.msg['Subject'].strip() if self.msg['Subject'] is not None else ''
+        fromname = self.msg['From'] if self.msg['From'] is not None else ''
 
         content = """<!doctype html>
 <html>
