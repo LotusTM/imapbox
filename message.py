@@ -139,7 +139,10 @@ class Message:
 
     def sanitizeFilename(self, filename):
         keepcharacters = (' ', '.', '_', '-')
-        return "".join(c for c in filename if c.isalnum() or c in keepcharacters).rstrip()
+        filename = "".join(c for c in filename if c.isalnum() or c in keepcharacters).rstrip()
+        # Limit filename lenght to 125 symbols to avoid issues with eCryptfs
+        filename = filename[:125] + (filename[125:] and '...')
+        return filename
 
     def get_parts(self):
         if not hasattr(self, 'message_parts'):
