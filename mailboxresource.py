@@ -5,6 +5,7 @@ import re
 import email
 import hashlib
 import logging
+import imaplib
 from email import policy
 from message import Message
 from datetime import date, timedelta
