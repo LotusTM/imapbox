@@ -44,7 +44,7 @@ class MailboxClient:
         try:
             self.mailbox.login(self.username, self.password)
         except imaplib.IMAP4.error:
-            logging.exception('Unable to login to: ', self.username)
+            logging.exception('Unable to login to: %s', self.username)
 
     def copy_emails(self, days, limit, local_folder):
         self.days = days
