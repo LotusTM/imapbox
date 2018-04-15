@@ -102,11 +102,13 @@ class MailboxClient:
         else:
             directory = hashlib.sha3_256(body).hexdigest()
 
-        year = 'None'
-        if message['Date']:
+        try:
             match = email.utils.parsedate(message['Date'])
             if match:
                 year = str(match[0])
+        except Exception as e:
+            logging.warning('Faulty email: ', directory)
+            year = 'None'
 
         return os.path.join(self.local_folder, year, directory)
 
