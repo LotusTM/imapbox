@@ -118,7 +118,7 @@ class MailboxClient:
         try:
             message = email.message_from_bytes(body, policy=policy.default)
         except Exception as e:
-            logging.error(e)
+            logging.exception(e)
 
         directory = self.get_email_folder(message, body)
 
@@ -134,7 +134,7 @@ class MailboxClient:
             msg.extract_attachments()
 
         except Exception as e:
-            logging.info('Faulty email: ', directory)
+            logging.warning('Faulty email: ', directory)
             logging.exception(e)
 
         return True
