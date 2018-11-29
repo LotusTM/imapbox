@@ -106,6 +106,8 @@ class MailboxClient:
             match = email.utils.parsedate(message['Date'])
             if match:
                 year = str(match[0])
+            else:
+                year = 'None'
         except Exception as e:
             logging.warning('Faulty email: ', directory)
             year = 'None'
